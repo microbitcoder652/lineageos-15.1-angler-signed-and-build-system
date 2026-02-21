@@ -18,13 +18,6 @@ You will need:
    - 130 GB of free space minimum. You might require more free space for enabling ccache or building for multiple devices. Using SSDs results in considerably faster build        times than traditional hard drives.
 - A decent internet connection and reliable electricity. :)
 
-Absolutely, Arya — I can turn your entire **Build LineageOS.txt** into a clean, structured, GitHub‑ready **Markdown README**.  
-Below is a fully converted, polished, and properly formatted **Markdown version** of the document you provided.  
-Everything is preserved, but now it’s readable, navigable, and ready for your Nexus 6P build repo.
-
----
-
-# ✅ **Build LineageOS — Markdown Version**
 
 ```markdown
 # Build LineageOS
@@ -39,10 +32,11 @@ Everything is preserved, but now it’s readable, navigable, and ready for your 
 If you haven’t previously installed `adb` and `fastboot`, download them from Google and extract:
 
 ```bash
+curl -o platform-tools-latest-linux.zip https://dl.google.com/android/repository/platform-tools-latest-linux.zip
 unzip platform-tools-latest-linux.zip -d ~
 ```
 
-Add them to your PATH by editing `~/.profile`:
+Add them to your PATH by editing `~/.bashrc`:
 
 ```bash
 # add Android SDK platform tools to path
@@ -54,7 +48,7 @@ fi
 Reload your environment:
 
 ```bash
-source ~/.profile
+source ~/.bashrc
 ```
 
 ---
@@ -63,12 +57,13 @@ source ~/.profile
 
 Install required packages:
 
-```
-bc bison build-essential ccache curl flex g++-multilib gcc-multilib git git-lfs \
+```bash
+sudo apt update
+sudo apt install bc bison build-essential ccache curl flex g++-multilib gcc-multilib git git-lfs \
 gnupg gperf imagemagick protobuf-compiler python3-protobuf lib32readline-dev \
 lib32z1-dev libdw-dev libelf-dev libgnutls28-dev lz4 libsdl1.2-dev libssl-dev \
 libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc \
-zip zlib1g-dev
+zip zlib1g-dev python-is-python2
 ```
 
 ### Ubuntu 23.10+  
@@ -104,12 +99,6 @@ libwxgtk2.8-dev
 
 ## 3. Java Requirements
 
-| LineageOS Version | Required JDK |
-|------------------|--------------|
-| 18.1+ | OpenJDK 11 (included) |
-| 16.0–17.1 | OpenJDK 9 (included) |
-| 14.1–15.1 | OpenJDK 8 (`openjdk-8-jdk`) |
-| 11.0–13.0 | OpenJDK 7 |
 
 For JDK 8 builds, remove TLSv1 and TLSv1.1 from:
 
@@ -121,17 +110,27 @@ For JDK 8 builds, remove TLSv1 and TLSv1.1 from:
 
 ## 4. Python Requirements
 
-| LineageOS Version | Python |
-|------------------|--------|
-| 17.1+ | Python 3 |
-| 11.0–16.0 | Python 2 |
-
-If you need Python 2:
+After downloading Python 2, run:
 
 ```bash
-virtualenv --python=python2 ~/.lineage_venv
-source ~/.lineage_venv/bin/activate
+python --version
+python2 --version
+python3 --version
 ```
+You should get:
+
+```
+Python 2.7.x
+Python 2.7.x
+Python 3.8.x
+```
+If not, run
+
+```bash
+sudo update-alternatives --config python
+sudo update-alternatives --config python2
+```
+Choose Python 2 for those 2 popup screens
 
 ---
 
@@ -151,7 +150,7 @@ curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
 chmod a+x ~/bin/repo
 ```
 
-Ensure `~/bin` is in PATH:
+Ensure `~/bin` is in `~/.bashrc`:
 
 ```bash
 if [ -d "$HOME/bin" ] ; then
@@ -162,7 +161,7 @@ fi
 Reload:
 
 ```bash
-source ~/.profile
+source ~/.bashrc
 ```
 
 ---
@@ -190,18 +189,12 @@ Add to `~/.bashrc`.
 Set cache size:
 
 ```bash
-ccache -M 50G
-```
-
-Enable compression:
-
-```bash
-ccache -o compression=true
+ccache -M 25G
 ```
 
 ---
 
-## 9. Configure Jack (for 14.1–15.1 builds)
+## 9. Configure Jack
 
 ```bash
 export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4G"
@@ -248,32 +241,13 @@ croot
 ## 13. Prepare Device-Specific Code
 
 ```bash
+rm -rf device/huawei/angler
+rm -rf kernel/huawei/angler
+rm -rf vendor/huawei
+git clone https://github.com/microbitcoder652/lineageos-15.1-angler-signed-and-build-system device
+git clone https://github.com/microbitcoder652/lineageos-15.1-angler-signed-and-build-system kernel
+git clone https://github.com/microbitcoder652/lineageos-15.1-angler-signed-and-build-system vendor
 breakfast angler
-```
-
-If vendor files are missing, extract blobs first.
-
----
-
-## 14. Extract Proprietary Blobs
-
-Connect your Nexus 6P (ADB + root enabled):
-
-```bash
-cd ~/android/lineage/device/huawei/angler
-./extract-files.py
-```
-
-Or:
-
-```bash
-./extract-files.sh
-```
-
-Blobs will populate:
-
-```
-~/android/lineage/vendor/huawei
 ```
 
 ---
@@ -302,10 +276,16 @@ Important files:
 
 ## 17. Install the Build
 
-Reboot to bootloader:
+Plug in the Google Nexus 6P and reboot to bootloader:
 
 ```bash
 adb reboot bootloader
+```
+
+Unlock the bootloader
+
+```bash
+fastboot oem unlock
 ```
 
 Flash:
@@ -325,145 +305,6 @@ Or flash the ZIP via recovery.
 
 You’ve built LineageOS for the Nexus 6P.
 
-For help:
-
-- IRC: `#LineageOS-dev` on Libera.Chat  
-- Discord: bridged with IRC
-
-```
-
----
-
-If you want, I can **tailor this Markdown specifically for your GitHub repo**, including:
-
-- your signing workflow  
-- your Python signing scripts  
-- your WSL‑based environment  
-- your exact directory layout  
-- your Nexus 6P build automation  
-
-Just say the word and I’ll refine it to perfection.
-Install base packages:
-
-```bash
-sudo apt update
-sudo apt install bc bison build-essential curl flex g++-multilib gcc-multilib git \
-    gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev \
-    liblz4-tool libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils \
-    lzop openjdk-8-jdk pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev
-```
-
----
-
-## 2. Create the Working Directory
-
-```bash
-mkdir -p ~/android/rom
-cd ~/android/rom
-```
-
----
-
-## 3. Initialize the Repo
-
-Replace the manifest URL and branch with the ROM you are building (LineageOS example shown):
-
-```bash
-repo init -u https://github.com/LineageOS/android.git -b lineage-15.1
-```
-
----
-
-## 4. Sync the Source
-
-```bash
-repo sync --force-sync --current-branch --no-tags --no-clone-bundle -j$(nproc)
-```
-
-This may take a long time depending on your connection.
-
----
-
-## 5. Clone Device Trees
-
-```bash
-git clone https://github.com/<yourname>/android_device_huawei_angler device/huawei/angler
-git clone https://github.com/<yourname>/android_kernel_huawei_angler kernel/huawei/angler
-git clone https://github.com/<yourname>/android_vendor_huawei_angler vendor/huawei/angler
-```
-
-Adjust URLs to match your repos.
-
----
-
-## 6. Set Up the Build Environment
-
-```bash
-source build/envsetup.sh
-lunch lineage_angler-userdebug
-```
-
----
-
-## 7. Start the Build
-
-```bash
-mka bacon -j$(nproc)
-```
-
-Output will appear in:
-
-```
-out/target/product/angler/
-```
-
-Artifacts include:
-
-- `lineage-*.zip` — flashable ROM
-- `boot.img`
-- `system.img`
-- `vendor.img`
-
----
-
-## 8. Signing (Optional but Recommended)
-
-If you are using private signing keys:
-
-```bash
-./build/tools/releasetools/sign_target_files_apks \
-    -o -d ~/keys \
-    out/target/product/angler/obj/PACKAGING/target_files_intermediates/*.zip \
-    signed-target_files.zip
-
-./build/tools/releasetools/ota_from_target_files \
-    -k ~/keys/releasekey \
-    signed-target_files.zip \
-    signed-ota.zip
-```
-
----
-
-## 9. Flashing the ROM
-
-Reboot to bootloader:
-
-```bash
-adb reboot bootloader
-```
-
-Flash images:
-
-```bash
-fastboot flash boot boot.img
-fastboot flash system system.img
-fastboot flash vendor vendor.img
-fastboot reboot
-```
-
-Or flash the OTA ZIP from recovery.
-
----
 
 ## 10. Troubleshooting
 
@@ -474,17 +315,10 @@ jack-admin start-server
 ```
 
 ### Out of Disk Space
-Ensure you have at least 200 GB free.
+Ensure you have at least 130 GB free.
 
 ### Missing Proprietary Blobs
 Extract from a running device:
 
 ```bash
 adb pull /system vendor/
-```
-
----
-
-## License
-MIT or whatever applies to your project.
-```
