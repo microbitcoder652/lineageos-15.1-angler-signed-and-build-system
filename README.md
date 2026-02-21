@@ -18,8 +18,6 @@ You will need:
    - 130 GB of free space minimum. You might require more free space for enabling ccache or building for multiple devices. Using SSDs results in considerably faster build        times than traditional hard drives.
 - A decent internet connection and reliable electricity. :)
 
-
-```markdown
 # Build LineageOS
 
 > **Note:** You only need to do these steps once.  
